@@ -5,15 +5,23 @@
 */
 
 // Constant/Variable Declaration
-const int redLED = ;      // Red LED pin
-const int yellowLED = ;   // Yellow LED pin
-const int greenLED = ;    // Green LED pin
-const int glaLED = ;      // Green-Left-Arrow LED pin
-const int buttonPin = ;   // Button pin
-const int buzzer = ;      // Buzzer pin
+const int redLED = 2;      // Red LED pin
+const int yellowLED = 4;   // Yellow LED pin
+const int greenLED = 5;    // Green LED pin
+const int glaLED = 7;      // Green-Left-Arrow LED pin
+const int buttonPin = 9;   // Button pin
+const int buzzer = 12;      // Buzzer pin
 
 void setup() {
 // Pin Assingments
+ Serial.begin(9600);           // set up Serial library at 9600 bps
+  // put your setup code here, to run once:
+  pinMode(2, OUTPUT);
+  pinMode(4, OUTPUT);
+  pinMode(5, OUTPUT);
+  pinMode(7, OUTPUT);
+  pinMode(9, OUTPUT);
+  pinMode(12, OUTPUT);
 }
 
 void loop() {
