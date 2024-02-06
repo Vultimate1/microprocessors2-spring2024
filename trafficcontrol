@@ -22,7 +22,14 @@ void loop() {
 
 //Function for Traffic Sequence --> Will dictate flash sequence
 void traffic_sequence() {
-
+//Calling FLash LED function in order to intiate GLA Sequenece
+flashLED(glaLED, 5000, 3000): // Green Left Arrow Sequence 
+//Intiate Sequence for Green Light LED
+flashLED(greenLED, 12000, 3000); / Green LED Sequence 
+//Intiate Sequence for Yellow Light LED
+lightON(yellowLED, 3000); // Yellow LED Sequence 
+//Intiate Sequence for Red Light 
+flashLED(redLED, 20000, 3000) // RED LED Sequence
 }
 
 //Function for flashing LED 
