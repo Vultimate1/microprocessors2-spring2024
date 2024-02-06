@@ -3,3 +3,35 @@
    Authors: Romeo Tim-Louangphixai, Alexander Chairs, Sriram Krishnamoorthy
    Assingment Due: Febuary 25th 2024
 */ 
+const int red = 2;
+const int yellow = 4;
+const int green = 5;
+const int green_arrow = 7;
+const int buzzer = 9;
+const int button = 12;
+void setup() {
+  Serial.begin(9600);           // set up Serial library at 9600 bps
+  // put your setup code here, to run once:
+  pinMode(2, OUTPUT);
+  pinMode(4, OUTPUT);
+  pinMode(5, OUTPUT);
+  pinMode(7, OUTPUT);
+  pinMode(9, OUTPUT);
+  pinMode(12, OUTPUT);
+}
+
+int arr[] = {2,4,5,7,9,12};
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  for (int i=0; i<5; i++) {
+    if (digitalRead(12)==HIGH) {
+      digitalWrite(arr[i], HIGH);
+      delay(500);
+      digitalWrite(arr[i], LOW);
+      delay(500);
+      Serial.print(i+": ");
+      Serial.println(digitalRead(arr[i]));
+    }
+  }
+}
