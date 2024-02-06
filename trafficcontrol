@@ -2,6 +2,51 @@
    Lab 1: Traffic Light Controller
    Authors: Romeo Tim-Louangphixai, Alexander Chairs, Sriram Krishnamoorthy
    Assingment Due: Febuary 25th 2024
+
+// Constant/Variable Declaration
+const int redLED = ;      // Red LED pin
+const int yellowLED = ;   // Yellow LED pin
+const int greenLED = ;    // Green LED pin
+const int glaLED = ;      // Green-Left-Arrow LED pin
+const int buttonPin = ;   // Button pin
+const int buzzer = ;      // Buzzer pin
+
+void setup() {
+// Pin Assingments
+}
+
+void loop() {
+//Run Start up Sequence then traffic_sequence
+}
+
+//Function for Traffic Sequence --> Will dictate flash sequence
+void traffic_sequence() {
+
+}
+
+//Function for flashing LED 
+void flashLED(int led, int duration, int flashTime = 0) {
+
+}
+
+//function for Light being on
+void lightOn(int led, int duration){
+//Beep the buzzer before lgiht changes
+
+}
+
+//Function for Buzzer Beeping 
+void beepBuzzer() {
+//Turn on Buzzer for 3 Seconds
+
+}
+
+
+
+
+
+
+//Template Testing for All Hardware
 */ 
 const int red = 2;
 const int yellow = 4;
