@@ -40,12 +40,19 @@ void flashLED(int led, int duration, int flashTime = 0) {
 //function for Light being on
 void lightOn(int led, int duration){
 //Beep the buzzer before lgiht changes
+   beepBuzzer();
+   digitalWrite(led, HIGH);
+   delay(duration);
+   
 
 }
 
 //Function for Buzzer Beeping 
 void beepBuzzer() {
 //Turn on Buzzer for 3 Seconds
+   digitalWrite(9, HIGH);
+   delay(3000);
+   digitalWrite(9, LOW);
 
 }
 
