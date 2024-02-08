@@ -33,25 +33,34 @@ if (digitalRead(buttonPin) == HIGH) {
    trafficSequence(); 
    }
 else {
-   flashLED(redLED, 1000); //This will call function flashLED to flash it with 1 sec on and 1 sec off
+   int mode = digitalRead(redLED);
+   flashLED(redLED, mode, 1000); //This will call function flashLED to flash it with 1 sec on and 1 sec off
    }
 }
 
 //Function for Traffic Sequence --> Will dictate flash sequence
 void traffic_sequence() {
-//Calling FLash LED function in order to intiate GLA Sequenece
-flashLED(glaLED, 5000, 3000): // Green Left Arrow Sequence 
-//Intiate Sequence for Green Light LED
-flashLED(greenLED, 12000, 3000); / Green LED Sequence 
-//Intiate Sequence for Yellow Light LED
-lightON(yellowLED, 3000); // Yellow LED Sequence 
-//Intiate Sequence for Red Light 
-flashLED(redLED, 20000, 3000) // RED LED Sequence
+   //Calling FLash LED function in order to intiate GLA Sequenece
+   int mode = digitalRead(glaLED);
+   flashLED(glaLED, mode, 5000, 3000): // Green Left Arrow Sequence 
+   //Intiate Sequence for Green Light LED
+   mode = digitalRead(greenLED);
+   flashLED(greenLED, mode, 12000, 3000); / Green LED Sequence 
+   //Intiate Sequence for Yellow Light LED
+   lightON(yellowLED, 3000); // Yellow LED Sequence 
+   //Intiate Sequence for Red Light 
+   mode = digitalRead(redLED);
+   flashLED(redLED, 20000, 3000) // RED LED Sequence
 }
 
 //Function for flashing LED 
-void flashLED(int led, int duration, int flashTime = 0) {
-
+void flashLED(int led, int mode, int duration, int flashTime = 0) {
+   digitalWrite(led, !mode);
+   delay(duration);
+   digitalWrite(led, mode);
+   delay(duration);
+   digitalWrite(led, !mode);
+   delay(duration);
 }
 
 //function for Light being on
@@ -69,7 +78,7 @@ void beepBuzzer() {
    digitalWrite(9, HIGH);
    delay(3000);
    digitalWrite(9, LOW);
-
+   delay(3000);
 }
 
 
