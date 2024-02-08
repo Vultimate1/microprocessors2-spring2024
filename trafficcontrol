@@ -26,6 +26,15 @@ void setup() {
 
 void loop() {
 //Run Start up Sequence then traffic_sequence
+//when the system starts up it will check the button is pressed 
+//if the button is pressed then it will run the traffic light seqwuence
+
+if (digitalRead(buttonPin) == HIGH) {
+   trafficSequence(); 
+   }
+else {
+   flashLED(redLED, 1000); //This will call function flashLED to flash it with 1 sec on and 1 sec off
+   }
 }
 
 //Function for Traffic Sequence --> Will dictate flash sequence
@@ -51,8 +60,7 @@ void lightOn(int led, int duration){
    beepBuzzer();
    digitalWrite(led, HIGH);
    delay(duration);
-   
-
+   digitalWrite(led,LOW);
 }
 
 //Function for Buzzer Beeping 
