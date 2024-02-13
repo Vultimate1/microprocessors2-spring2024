@@ -1,0 +1,72 @@
+// Constant/Variable Declaration
+const int redLED = 2;      // Red LED pin
+const int yellowLED = 4;   // Yellow LED pin
+const int greenLED = 5;    // Green LED pin
+const int glaLED = 7;      // Green-Left-Arrow LED pin
+const int buttonPin = 9;   // Button pin
+const int buzzer = 12;     // Buzzer pin
+
+void setup() {
+  // Pin Assignments
+  Serial.begin(9600); // set up Serial library at 9600 bps
+  
+  pinMode(redLED, OUTPUT);
+  pinMode(yellowLED, OUTPUT);
+  pinMode(greenLED, OUTPUT);
+  pinMode(glaLED, OUTPUT);
+  pinMode(buttonPin, INPUT); // Set buttonPin as an input
+  pinMode(buzzer, OUTPUT);
+}
+
+void loop() {
+  // Run Start up Sequence then traffic sequence
+  // when the system starts up it will check the button is pressed 
+  // if the button is pressed then it will run the traffic light sequence
+
+  if (digitalRead(buttonPin) == HIGH) {
+    traffic_sequence(); 
+  } else {
+    int mode = digitalRead(redLED);
+    flashLED(redLED, mode, 1000); // This will call function flashLED to flash it with 1 sec on and 1 sec off
+  }
+}
+
+// Function for Traffic Sequence --> Will dictate flash sequence
+void traffic_sequence() {
+  // Calling Flash LED function in order to initiate GLA Sequence
+  int mode = digitalRead(glaLED);
+  flashLED(glaLED, mode, 5000); // Green Left Arrow Sequence 
+  // Initiate Sequence for Green Light LED
+  mode = digitalRead(greenLED);
+  flashLED(greenLED, mode, 12000); // Green LED Sequence 
+  // Initiate Sequence for Yellow Light LED
+  lightOn(yellowLED, 3000); // Yellow LED Sequence 
+  // Initiate Sequence for Red Light 
+  mode = digitalRead(redLED);
+  flashLED(redLED, mode, 20000); // RED LED Sequence
+}
+
+// Function for flashing LED 
+void flashLED(int led, int mode, int duration) {
+  digitalWrite(led, !mode);
+  delay(duration);
+  digitalWrite(led, mode);
+  delay(duration);
+}
+
+// Function for Light being on
+void lightOn(int led, int duration) {
+  // Beep the buzzer before light changes
+  beepBuzzer();
+  digitalWrite(led, HIGH);
+  delay(duration);
+  digitalWrite(led, LOW);
+}
+
+// Function for Buzzer Beeping 
+void beepBuzzer() {
+  // Turn on Buzzer for 3 Seconds
+  digitalWrite(buzzer, HIGH);
+  delay(3000);
+  digitalWrite(buzzer, LOW);
+}
