@@ -1,1 +1,21 @@
+/* EECE. 4520 Microprocessors II and Embedded System Design 
+   Lab 1: Traffic Light Controller
+   Authors: Romeo Tim-Louangphixai, Alexander Chairs, Sriram Krishnamoorthy
+   Assingment Due: Febuary 25th 2024
+*/
+
+// Constant/Variable Declaration
+const int redLED = 2;      // Red LED pin
+const int yellowLED = 4;   // Yellow LED pin
+const int greenLED = 5;    // Green LED pin
+const int glaLED = 7;      // Green-Left-Arrow LED pin
+const int buttonPin = 9;   // Button pin
+const int buzzer = 12;     // Buzzer pin
+
+//Variables for timer interupprt
+volatile int state = 0; //There are 4 state: GLA, RED, YELLOW and GREEN and this variable will tell wvhies onts are active 
+
+//ISR is triggered once every second. It increments timerCounter and checks the current state.
+//When a timer reaches the threshold of a certain duration it change states and reset
+volatile unsigned long timerCounter = 0; 
 
