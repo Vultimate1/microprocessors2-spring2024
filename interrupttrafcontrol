@@ -1,21 +1,241 @@
-/* EECE. 4520 Microprocessors II and Embedded System Design 
-   Lab 1: Traffic Light Controller
-   Authors: Romeo Tim-Louangphixai, Alexander Chairs, Sriram Krishnamoorthy
-   Assingment Due: Febuary 25th 2024
-*/
-
-// Constant/Variable Declaration
 const int redLED = 2;      // Red LED pin
 const int yellowLED = 4;   // Yellow LED pin
 const int greenLED = 5;    // Green LED pin
 const int glaLED = 7;      // Green-Left-Arrow LED pin
 const int buttonPin = 9;   // Button pin
 const int buzzer = 12;     // Buzzer pin
+int buttonread = 0;
+int finished_state = 0;
+// State variables
+enum TrafficState { START, RED, GLA, GREEN, YELLOW, BUZZER, END };
+TrafficState currentState = START;
+TrafficState nextState = RED;
 
-//Variables for timer interupprt
-volatile int state = 0; //There are 4 state: GLA, RED, YELLOW and GREEN and this variable will tell wvhies onts are active 
+int buttonState; //current state of program
+// Timing variables
+volatile unsigned int timerCount = 0; // the timer count, continually updated in timer interrupt
+unsigned long stateDuration = 0; // duration of the current state, changed when current state has finished
 
-//ISR is triggered once every second. It increments timerCounter and checks the current state.
-//When a timer reaches the threshold of a certain duration it change states and reset
-volatile unsigned long timerCounter = 0; 
+// New variable for initial flashing state
+boolean initialFlash = true; // true when the program starts up for the first time
 
+// Interrupt Service Routine for Timer1A
+ISR(TIMER1_COMPA_vect) {
+  timerCount++;
+  Serial.print("timercount = ");
+  Serial.println(timerCount);
+  changeState();
+}
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(redLED, OUTPUT);
+  pinMode(yellowLED, OUTPUT);
+  pinMode(greenLED, OUTPUT);
+  pinMode(glaLED, OUTPUT);
+  pinMode(buttonPin, INPUT); // Assuming a pullup button
+  pinMode(buzzer, OUTPUT);
+
+  cli(); // Stop interrupts for timer setup
+
+  // Set timer1 interrupt at 1Hz
+  TCCR1A = 0;
+  TCCR1B = 0;
+  TCNT1  = 0;
+  OCR1A = 15624; // Set compare match register for 1Hz increments
+  TCCR1B |= (1 << WGM12); // Turn on CTC mode
+  TCCR1B |= (1 << CS12) | (1 << CS10); // Set CS12 and CS10 bits for 1024 prescaler
+  TIMSK1 |= (1 << OCIE1A); // Enable timer compare interrupt
+  currentState = START; //initial state of program, red LED flashing 1 sec on 1 sec off
+  sei(); // Allow interrupts
+}
+
+void loop() {
+  // Handle initial state
+  buttonState = digitalRead(buttonPin); //gets current state of button pin
+  if (currentState == START) { // only executed once in the entire program when currentState == START
+      // only toggle the LED if the new button state is HIGH
+      if (buttonState == LOW) {
+        digitalWrite(buzzer, LOW);
+        Serial.println("In state START");
+        currentState=START;
+        changeState();
+      } else {
+        digitalWrite(buzzer, LOW);
+        stateDuration = 5;
+        finished_state = 1;
+        currentState=GLA; //transition to first state of actual loop, then exits condition of currentState == START
+        changeState(); 
+      }
+   } else {
+     if (buttonState == HIGH) { // if the button is pressed and the program is in the main loop, then transitions to the buzzer state
+        stateDuration = 3;
+        currentState = BUZZER;
+     }
+   }
+}
+
+void changeState() { //called every time timer interrupt goes off, where state is checked and respective action for the state is called
+    Serial.println("In change state");
+  // Turn off all LEDs and reset timer
+  
+//  currentState = nextState; // Transition to buzzer state before next state*/
+    Serial.print("timer count = ");
+    Serial.println(timerCount);
+    Serial.print("state duration is ");
+
+    switch (currentState) {
+    case START:
+      Serial.println("Still in START");
+      digitalWrite(redLED, timerCount%2); // if START state, then flash the LED on and off 1 second each
+      break;
+    case GLA:
+      Serial.println("In state GLA");
+      manageGLAState();
+      break;
+    case GREEN:
+      Serial.println("In state GREEN");
+      manageGreenState();
+      break;
+    case YELLOW:
+      Serial.println("In state YELLOW");
+      manageYellowState();
+      break;
+    case RED:
+      Serial.println("In state RED");
+      manageRedState();
+      break;
+    case BUZZER:
+      Serial.println("In state BUZZER");
+      manageBuzzerState();
+      break;
+    case END:
+      manageEndState(); // final state, executed once after buzzer has been executed and program is finished
+      break;
+  }
+}
+
+void manageBuzzerState() {
+    Serial.println(stateDuration);
+    Serial.println("GOING INTO THE BUZZER STATE!  ALL SYSTEMS STOP!!!!!!!!!!!!!!!!!!!");
+    digitalWrite(buzzer, LOW);
+    digitalWrite(redLED, LOW);
+    digitalWrite(greenLED, LOW);
+    digitalWrite(yellowLED, LOW);
+    digitalWrite(glaLED, LOW);
+ 
+    finished_state = 1; // state is marked as finished so no other state except END is executed
+    digitalWrite(buzzer, HIGH);
+    stateDuration = 3; // Buzzer for 3 seconds
+
+  if (timerCount >= stateDuration) {
+    stateDuration = 2;
+    digitalWrite(buzzer, LOW); // Turn off buzzer
+    currentState = END; // Transition to next state
+    //stateDuration = 0; // Reset state duration
+    //timerCount = 0; // Reset timer
+  }
+}
+
+void manageGLAState() {
+  nextState = GREEN; // state after GLA is green
+  Serial.println("inside gla state");
+  Serial.print("Is state finished? ");
+  Serial.println(finished_state ? "yes" : "no");
+  if (finished_state == 1) { // First entry, if the previous state is finished
+    finished_state = 0; // current state is not finished
+    timerCount = 0; // Reset timer
+    digitalWrite(redLED, LOW);
+    Serial.print("timer count = ");
+    Serial.println(timerCount);
+    digitalWrite(glaLED, HIGH);
+    Serial.print("state duration is ");
+    Serial.println(stateDuration);
+/*    Serial.print("amount of time left is ");
+    if (stateDuration>=timerCount) {
+          Serial.println(stateDuration - timerCount);
+    }*/
+    return;
+  } else if (timerCount >= stateDuration) {
+    Serial.println("timer is stateDuration");
+    currentState = nextState;
+    stateDuration = 12;
+    finished_state = 1;
+    Serial.println("we are entering green state");
+    //changeState();
+  } else if (timerCount >= stateDuration - 3) {
+    // Flash GLA LED in the last 3 seconds
+    digitalWrite(glaLED, timerCount % 2);
+  }
+}
+
+void manageGreenState() {
+  nextState = YELLOW;
+  stateDuration = 12;
+  if (finished_state == 1) { // First entry
+    timerCount = 0;
+    finished_state = 0;
+    digitalWrite(glaLED, LOW);
+    Serial.println("just entered green state");
+    digitalWrite(greenLED, HIGH);
+    stateDuration = 12; // Green light for 12 seconds
+  }
+  if (stateDuration>=timerCount) {
+       Serial.println(stateDuration - timerCount);
+  }
+  if (timerCount >= stateDuration) {
+    finished_state = 1;
+    stateDuration = 3; // yellow light is on for 3 seconds, preset
+    currentState = nextState; // sets current state to next state
+  } else if (timerCount >= stateDuration - 3) {
+    // Flash Green LED in the last 3 seconds
+    digitalWrite(greenLED, timerCount % 2);
+  }
+}
+
+void manageYellowState() {
+  if (finished_state == 1) { // First entry
+    timerCount = 0;
+    finished_state = 0;
+    digitalWrite(greenLED, LOW);
+    Serial.println("just entered yellow state");
+    digitalWrite(yellowLED, HIGH);
+    nextState = RED;
+  }
+  if (timerCount >= stateDuration) {
+    finished_state = 1;
+    stateDuration = 20;  // Red light for 20 seconds
+    currentState = nextState;
+  }
+}
+
+void manageRedState() {
+  if (finished_state == 1) { // First entry
+    finished_state = 0;
+    digitalWrite(yellowLED, LOW);
+    timerCount = 0;
+    digitalWrite(redLED, HIGH);
+    nextState = GLA;
+  }
+  if (timerCount >= stateDuration) {
+    currentState = nextState;
+    finished_state = 1;
+    //changeState();
+    stateDuration = 5; // next state is GLA, GLA LED on for 5 seconds
+  } else if (timerCount >= stateDuration - 3) {
+    // Flash Red LED in the last 3 seconds
+    digitalWrite(redLED, timerCount%2);
+  }
+}
+
+void manageEndState() {
+  if (finished_state == 0) {
+    digitalWrite(greenLED, HIGH);
+    timerCount = 0;
+  }
+  if (timerCount >= stateDuration) {
+    finished_state = 1; // green LED is on for 1 second and program is finished
+    digitalWrite(greenLED, LOW);
+    
+  }
+}
